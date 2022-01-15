@@ -9,6 +9,9 @@ from Applet.ports import applet_public,applet_private
 print("\n钉钉语言模块 小程序 已接入完毕")
 from Project.ports import project_public,project_private
 print("\n钉钉语言模块 项目 已接入完毕")
+from Applet.ports import applet_public,applet_private
+from Project.ports import project_public,project_private
+
 
 
 class DingDingLanguage():
