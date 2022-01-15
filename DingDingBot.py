@@ -8,19 +8,19 @@ DingDing_single_shujuhuancunTime = TTLDict()
 def DingDing_client(self):
     # 获取socket
     request_data = client_socket.recv(20000)
-    dd_post_userid, dd_post_sign, dd_post_timestamp, dd_post_mes, dd_post_moshi, dd_post_userIds, dd_post_isAdmin, dd_post_senderNick = DingDing_chushihua(request_data)
-    print(f"\n用户消息：{dd_post_mes}")
-    print(f"聊天模式：{dd_post_moshi} ",end="")
-    print(f"用户名称：{dd_post_senderNick}\n",end="")
-    print(f"用户群ID：{dd_post_userid} ",end="")
-    print(f"用户私ID：{dd_post_userIds}")
+    post_userid, post_sign, post_timestamp, post_mes, post_moshi, post_userids, post_isAdmin, post_senderNick = DingDing_chushihua(request_data)
+    print(f"\n用户消息：{post_mes}")
+    print(f"聊天模式：{post_moshi} ",end="")
+    print(f"用户名称：{post_senderNick}\n",end="")
+    print(f"用户群ID：{post_userid} ",end="")
+    print(f"用户私ID：{post_userids}")
     # 使用socket 回应钉钉 并查看模式
-    if dd_post_moshi == "2":
+    if post_moshi == "2":
         #群聊模式
-        DingDing_group(dd_post_userid, dd_post_sign, dd_post_timestamp, dd_post_mes, dd_post_userIds, dd_post_senderNick, dd_post_isAdmin)
-    if dd_post_moshi == "1":
+        DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userids, post_senderNick, post_isAdmin)
+    if post_moshi == "1":
         #单聊模式
-        DingDing_single(dd_post_userid, dd_post_mes, dd_post_userIds, dd_post_senderNick, dd_post_isAdmin)
+        DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin)
     # 关闭socket
     client_socket.close()
 
@@ -37,19 +37,19 @@ def DingDing_chushihua(request_data):
         print('other connect')
         return 0
     else:
-        dd_post_sign = dd_post_useful.get('sign').strip()
-        dd_post_timestamp = dd_post_useful.get('timestamp').strip()
+        post_sign = dd_post_useful.get('sign').strip()
+        post_timestamp = dd_post_useful.get('timestamp').strip()
         
         #主要参数 可自行增加
         dd_post_xinxiti = json.loads(request_data[-1])
-        dd_post_userid = dd_post_xinxiti.get('senderId').strip()
-        dd_post_mes = dd_post_xinxiti.get('text').get('content').strip()
-        dd_post_moshi = dd_post_xinxiti.get('conversationType').strip()
-        dd_post_userIds = dd_post_xinxiti.get('senderStaffId').strip()
-        dd_post_isAdmin = dd_post_xinxiti.get('isAdmin')
-        dd_post_senderNick = dd_post_xinxiti.get('senderNick')
+        post_userid = dd_post_xinxiti.get('senderId').strip()
+        post_mes = dd_post_xinxiti.get('text').get('content').strip()
+        post_moshi = dd_post_xinxiti.get('conversationType').strip()
+        post_userids = dd_post_xinxiti.get('senderStaffId').strip()
+        post_isAdmin = dd_post_xinxiti.get('isAdmin')
+        post_senderNick = dd_post_xinxiti.get('senderNick')
 
-    return dd_post_userid, dd_post_sign, dd_post_timestamp, dd_post_mes, dd_post_moshi, dd_post_userIds, dd_post_isAdmin, dd_post_senderNick
+    return post_userid, post_sign, post_timestamp, post_mes, post_moshi, post_userids, post_isAdmin, post_senderNick
 
 def DingDingSet():
     with open(f"./data/DingDingSet.json","r",encoding="utf-8") as set:
@@ -60,33 +60,33 @@ def DingDingSet():
     AppSecret_set = (DingSet_text['set'][0]['AppSecret'])
     AppKey_set = (DingSet_text['set'][0]['AppKey'])
 
-def DingDing_group(dd_post_userid, dd_post_sign, dd_post_timestamp, dd_post_mes, dd_post_userIds, dd_post_senderNick, dd_post_isAdmin):
+def DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userids, post_senderNick, post_isAdmin):
     # 配置token
     # 得到当前时间戳
     timestamp = str(round(time.time() * 1000))
     # 计算签名
     app_secret = AppSecret_set
     app_secret_enc = app_secret.encode('utf-8')
-    string_to_sign = '{}\n{}'.format(dd_post_timestamp, app_secret)
+    string_to_sign = '{}\n{}'.format(post_timestamp, app_secret)
     string_to_sign_enc = string_to_sign.encode('utf-8')
     hmac_code = hmac.new(app_secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()
     sign = base64.b64encode(hmac_code).decode('utf-8')
     # 验证是否来自钉钉的合法请求
-    if (abs(int(dd_post_timestamp) - int(timestamp)) < 3600000 and dd_post_sign == sign):
+    if (abs(int(post_timestamp) - int(timestamp)) < 3600000 and post_sign == sign):
         webhook=Webhook_set
         header = {
             "Content-Type": "application/json",
             "Charset": "UTF-8"
         }
         # 发送消息
-        message_json = json.dumps(DingDingLanguage(dd_post_userid, dd_post_mes, dd_post_userIds, dd_post_senderNick, dd_post_isAdmin).selectMes())
+        message_json = json.dumps(DingDingLanguage(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin).selectMes())
         # 返回发送状态
         info = requests.post(url=webhook, data=message_json, headers=header)
         print(info.text)
     else:
         print("Warning:Not DingDing's post")
 
-def DingDing_single(dd_post_userid, dd_post_mes, dd_post_userIds, dd_post_senderNick, dd_post_isAdmin):
+def DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin):
     #与群聊获得消息的接口一致，获取后转义成可识别语句
     url = "https://api.dingtalk.com/v1.0/robot/oToMessages/batchSend"
     head = {
@@ -95,9 +95,9 @@ def DingDing_single(dd_post_userid, dd_post_mes, dd_post_userIds, dd_post_sender
         "Content-Type":"application/json"
     }
 
-    DingDing_single_message_json = json.dumps(DingDingLanguage(dd_post_userid, dd_post_mes, dd_post_userIds, dd_post_senderNick, dd_post_isAdmin).selectMes())
+    DingDing_single_message_json = json.dumps(DingDingLanguage(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin).selectMes())
     DingDing_single_message_json_xiaoxiti = (DingDing_single_message_json)
-    DingDing_single_message_json_zhuanyi = (DingDing_single_xiaoxiti_zhuanyi(dd_post_userIds, DingDing_single_message_json_xiaoxiti))
+    DingDing_single_message_json_zhuanyi = (DingDing_single_xiaoxiti_zhuanyi(post_userids, DingDing_single_message_json_xiaoxiti))
     print(f"投出消息\n{DingDing_single_message_json_zhuanyi}")
     info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
     info_text = eval(info.text)
@@ -105,15 +105,15 @@ def DingDing_single(dd_post_userid, dd_post_mes, dd_post_userIds, dd_post_sender
     try:
         single_message_text = info_text["message"]
         if single_message_text == "msgParam必须是json格式":
-            single_message_chongshi = json.dumps(DingDingLanguage.send_single_error(dd_post_userid))
+            single_message_chongshi = json.dumps(DingDingLanguage.send_single_error(post_userid))
             DingDing_single_message_json_xiaoxiti = (single_message_chongshi)
-            DingDing_single_message_json_zhuanyi = (DingDing_single_xiaoxiti_zhuanyi(dd_post_userIds, DingDing_single_message_json_xiaoxiti))
+            DingDing_single_message_json_zhuanyi = (DingDing_single_xiaoxiti_zhuanyi(post_userids, DingDing_single_message_json_xiaoxiti))
             info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
             print(f"获得回应\n{info.text}")
     except:
         print(f"获得回应\n{info.text}")
 
-def DingDing_single_xiaoxiti_zhuanyi(dd_post_userIds, send_mes):
+def DingDing_single_xiaoxiti_zhuanyi(post_userids, send_mes):
     send_mes = json.loads(send_mes)
     DingDing_single_xiaoxiti_moshi = send_mes['msgtype']
     if DingDing_single_xiaoxiti_moshi == "text":
@@ -123,7 +123,7 @@ def DingDing_single_xiaoxiti_zhuanyi(dd_post_userIds, send_mes):
         DingDing_single_xiaoxiti_msgParam_bianliang = ({"content":DingDing_single_xiaoxiti_msgParam})
         DingDing_single_xiaoxiti_json = {
         "robotCode" : AppKey_set,
-        "userIds" : [ dd_post_userIds ],
+        "userIds" : [ post_userids ],
         "msgKey" : DingDing_single_xiaoxiti_msgKey,
         "msgParam" : ''+str(DingDing_single_xiaoxiti_msgParam_bianliang)+''
         }
@@ -136,7 +136,7 @@ def DingDing_single_xiaoxiti_zhuanyi(dd_post_userIds, send_mes):
         DingDing_single_xiaoxiti_msgParam_bianliang = ({"text": DingDing_single_xiaoxiti_msgParam_text,"title": DingDing_single_xiaoxiti_msgParam_title})
         DingDing_single_xiaoxiti_json = {
         "robotCode" : AppKey_set,
-        "userIds" : [ dd_post_userIds ],
+        "userIds" : [ post_userids ],
         "msgKey" : DingDing_single_xiaoxiti_msgKey,
         "msgParam" : ''+str(DingDing_single_xiaoxiti_msgParam_bianliang)+''
         }
