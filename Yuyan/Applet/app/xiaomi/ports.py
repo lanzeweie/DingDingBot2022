@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
-import sys,os
+import sys,os,datetime
+now = datetime.datetime.now().strftime('%Y年-%m月-%d日 %H:%M')
 start_lu = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(start_lu)
 from updatabs import xiaomiyundong
@@ -28,6 +29,8 @@ class xiaomiyundong_chushi():
         password = user_xinxi[1]
         xiaomiyundong_xinxi = ""
         xiaomiyundong_xinxi = xiaomiyundong.main(phone, password, step) + '\n'
+        with open(f"{start_lu}/xiaomi.log","a",encoding="utf-8") as rizhi:
+            rizhi.write(f"[{now}]\n用户ID：{user_ding}\n启动刷步数小程序\n刷取步数：{step}\n程序日志：\n{xiaomiyundong_xinxi}\n")
         return xiaomiyundong_xinxi
 
 
