@@ -23,6 +23,8 @@ class DingDingLanguage():
         self.post_isAdmin = post_isAdmin
         
     def selectMes(self):
+        applet_public_ports = applet_public(self.post_userid, self.post_mes, self.post_userIds, self.post_senderNick, self.post_isAdmin)
+        applet_private_ports = applet_private(self.post_userid, self.post_mes, self.post_userIds, self.post_senderNick, self.post_isAdmin)
         #载入库存
         #信息
         #post_mes = 发送者信息
@@ -92,14 +94,14 @@ class DingDingLanguage():
         #app-----------------------------------------------------------------------------------
         #HM-ACG-url 带管理
         if (eval(bot_message_app_hmacgjpg)):
-            return applet_public.appHMACGurl(self.post_userid)
+            return applet_public_ports.appHMACGurl()
         if (eval(bot_message_app_hmacgjpg_up)):
-            return applet_public.appHMACGurlUP(self.post_userid)
+            return applet_public_ports.appHMACGurlUP()
         if (eval(bot_message_app_hmacgjpg_up_no)):
             send_mes = '''你没有权力哦,只有我的周爸爸可以命令我干这种事情哦(●'◡'●)'''
             return DingDingLanguage.sendText(self.post_userid, send_mes)
         if (self.post_mes == "幻猫网帮助"):
-            return applet_public.appHMACGhelp(self.post_userid)
+            return applet_public_ports.appHMACGhelp()
 
         #weather 天气 把用户词汇分开进行判断
         #关键词天气 #如果分析除天气 则开始下一步地区判断
@@ -107,7 +109,7 @@ class DingDingLanguage():
         if (weather_app_panduan_ci == '天气'):
             #地区
             self.post_mes_weather = self.post_mes[0:self.post_mes.rfind('天')]
-            return applet_public.appWeather(self.post_userid,self.post_mes_weather)
+            return applet_public_ports.appWeather(self.post_userid,self.post_mes_weather)
 
         #baidu_soutu 百度图片搜索 
         baidu_soutu_app_ci = self.post_mes[0:self.post_mes.rfind(':')]
@@ -116,11 +118,11 @@ class DingDingLanguage():
             self.post_mes_baidusoutu = self.post_mes[self.post_mes.rfind(':'):]
             #修改字符
             self.post_mes_baidusoutu = self.post_mes_baidusoutu.replace(":","")
-            return applet_public.appBaidusoutu(self.post_userid, self.post_mes_baidusoutu)
+            return applet_public_ports.appBaidusoutu(self.post_userid, self.post_mes_baidusoutu)
 
         #PIC-bian-url 带管理 彼岸网
         if (eval(bot_message_app_picbian_up)):
-            return applet_public.appPICbianUP(self.post_userid)
+            return applet_public_ports.appPICbianUP(self.post_userid)
         elif (eval(bot_message_app_picbian_up_no)):
             send_mes = '''你没有权力哦,只有我的周爸爸可以命令我干这种事情哦(●'◡'●)'''
             return DingDingLanguage.sendText(self.post_userid, send_mes)
@@ -129,14 +131,14 @@ class DingDingLanguage():
         if (eval(bot_message_app_picbian)):
             self.post_mes_PICbian = self.post_mes[self.post_mes.rfind('的'):]
             self.post_mes_PICbian = self.post_mes_PICbian.replace("的","")
-            return applet_public.appPICbian(self.post_userid,self.post_mes_PICbian)
+            return applet_public_ports.appPICbian(self.post_userid,self.post_mes_PICbian)
         #彼岸网帮助
         if (self.post_mes == "彼岸网帮助"):
-            return applet_public.appPICbianhelp(self.post_userid)
+            return applet_public_ports.appPICbianhelp(self.post_userid)
 
         #随机二次元图片
         if (eval(bot_message_app_api_pixivweb)):
-            return applet_public.appapipixivweb(self.post_userid)
+            return applet_public_ports.appapipixivweb(self.post_userid)
 
         #if (self.post_mes == '天气'):
             #send_mes = getWeather()
@@ -154,7 +156,7 @@ class DingDingLanguage():
             xiaomi_bushu_bushu_init = self.post_mes[self.post_mes.rfind(':'):]
             #修改字符
             xiaomi_bushu_bushu_surr = xiaomi_bushu_bushu_init.replace(":","")
-            return applet_private.siappxiaomibushu2d(self.post_userid,xiaomi_bushu_bushu_surr)
+            return applet_private_ports.siappxiaomibushu2d(self.post_userid,xiaomi_bushu_bushu_surr)
 
         #生日项目
         if (self.post_mes == "生日功能帮助"):

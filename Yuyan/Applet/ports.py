@@ -7,8 +7,12 @@ sys.path.append(start_lu)
 from Applet.app.xiaomi.ports import xiaomiyundong_chushi
 #公共的小程序接口
 class applet_public():
-    def __init__(self,post_userid):
+    def __init__(self,post_userid, post_mes, post_userIds, post_senderNick, post_isAdmin):
         self.post_userid = post_userid
+        self.post_mes = post_mes
+        self.post_userIds = post_userIds
+        self.post_senderNick = post_senderNick
+        self.post_isAdmin = post_isAdmin
 
     def appHMACGurl(self):
         #幻猫小程序
@@ -69,7 +73,7 @@ class applet_public():
                 "text": "# **💁幻猫网小程序 帮助💁** \n **我该如何使用？** \n\n >@私人助手 发一张幻猫的cos图 \n\n **简介一点** \n\n >@私人助理 发张cos图 \n\n-------------------\n\n **我是管理员如何更新图库？** \n\n >@私人助手 更新幻猫网"
             },
             "at": {
-                "atDingtalkIds": [self.postuserid],
+                "atDingtalkIds": [self.post_userid],
                 "isAtAll": False
             }
         }
@@ -202,6 +206,13 @@ class applet_public():
 
 #私人的小程序接口
 class applet_private():
+    def __init__(self,post_userid, post_mes, post_userIds, post_senderNick, post_isAdmin) -> str:
+        self.post_userid = post_userid
+        self.post_mes = post_mes
+        self.post_userIds = post_userIds
+        self.post_senderNick = post_senderNick
+        self.post_isAdmin = post_isAdmin
+
     def siappxiaomibushu2d(post_userid,xiaomi_bushu_bushu_surr):
         cmd = xiaomiyundong_chushi.start(post_userid,xiaomi_bushu_bushu_surr)
         if cmd is None:
