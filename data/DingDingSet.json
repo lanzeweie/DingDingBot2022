@@ -1,0 +1,8 @@
+{
+    "name":"钉钉企业机器人(私人助理)配置文件",
+    "set":[{
+        "Webhook":"null",
+        "AppSecret":"null",
+        "AppKey":"null"
+    }]
+}
