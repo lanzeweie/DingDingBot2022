@@ -181,7 +181,7 @@ def DingDing_single_accessToken_yanzheng():
         return DingDing_single_accessToken_backup
 
 if __name__ == "__main__":
-    # 使用 socket 建立监听服务端 实时接受钉钉下发的信息
+    # 使用 socket 建立监听服务端 实时接受钉钉下发的信息 端口为 8978
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         server_socket.bind(("", 8978))
