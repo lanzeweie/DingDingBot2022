@@ -1,8 +1,8 @@
 # -*- coding:utf-8 -*-
 import sys,os
-from updatabs import xiaomiyundong
 start_lu = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(start_lu)
+from updatabs import xiaomiyundong
 print("\n成功接入 小米运动 刷步数程序")
 class xiaomiyundong_chushi():
     def user(user_ding):
@@ -22,6 +22,8 @@ class xiaomiyundong_chushi():
                 shu+=1
     def start(user_ding,step):
         user_xinxi = xiaomiyundong_chushi.user(user_ding)
+        if user_xinxi is None:
+            return None
         phone = user_xinxi[0]
         password = user_xinxi[1]
         xiaomiyundong_xinxi = ""
