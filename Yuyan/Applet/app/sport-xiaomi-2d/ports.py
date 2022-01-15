@@ -5,7 +5,7 @@ start_lu = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(start_lu)
 class xiaomiyundong_chushi():
     def user(user_ding):
-        with open("C:\\Users\\lanze\\Desktop\\试验品\\钉钉机器人\\2022Git\\Yuyan\Applet\\app\\sport-xiaomi-2d\\user.json","r",encoding="utf-8") as user:
+        with open(f"{start_lu}/user.json","r",encoding="utf-8") as user:
             user_json = user.read()
 
         user_json = eval(user_json)
