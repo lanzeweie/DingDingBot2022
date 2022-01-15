@@ -21,7 +21,7 @@ class xiaomiyundong_chushi():
                 return phone,password
             else:
                 shu+=1
-    def start(user_ding,step):
+    def start(user_ding,user_name,step):
         user_xinxi = xiaomiyundong_chushi.user(user_ding)
         if user_xinxi is None:
             return None
@@ -30,7 +30,7 @@ class xiaomiyundong_chushi():
         xiaomiyundong_xinxi = ""
         xiaomiyundong_xinxi = xiaomiyundong.main(phone, password, step) + '\n'
         with open(f"{start_lu}/xiaomi.log","a",encoding="utf-8") as rizhi:
-            rizhi.write(f"[{now}]\n用户ID：{user_ding}\n启动刷步数小程序\n刷取步数：{step}\n程序日志：\n{xiaomiyundong_xinxi}\n")
+            rizhi.write(f"[{now}]\n用户名称：{user_name}\n用户ID：{user_ding}\n启动刷步数小程序\n刷取步数：{step}\n程序日志：\n————————————————\n{xiaomiyundong_xinxi}\n")
         return xiaomiyundong_xinxi
 
 
