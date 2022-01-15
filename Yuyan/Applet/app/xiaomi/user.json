@@ -1,0 +1,15 @@
+{
+    "name":"小米运动刷步数的用户库",
+    "user":[
+        {
+            "userid":"zhou",
+            "phone":"xxxx",
+            "password":"xxx"
+        },
+        {
+            "userid":"luo",
+            "phone":"xxx",
+            "password":"xxx"
+        }
+    ]
+}
