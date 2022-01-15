@@ -108,8 +108,8 @@ class DingDingLanguage():
         weather_app_panduan_ci = self.post_mes[self.post_mes.rfind('天'):]
         if (weather_app_panduan_ci == '天气'):
             #地区
-            self.post_mes_weather = self.post_mes[0:self.post_mes.rfind('天')]
-            return applet_public_ports.appWeather(self.post_userid,self.post_mes_weather)
+            post_mes_weather = self.post_mes[0:self.post_mes.rfind('天')]
+            return applet_public_ports.appWeather(post_mes_weather)
 
         #baidu_soutu 百度图片搜索 
         baidu_soutu_app_ci = self.post_mes[0:self.post_mes.rfind(':')]
@@ -156,7 +156,7 @@ class DingDingLanguage():
             xiaomi_bushu_bushu_init = self.post_mes[self.post_mes.rfind(':'):]
             #修改字符
             xiaomi_bushu_bushu_surr = xiaomi_bushu_bushu_init.replace(":","")
-            return applet_private_ports.siappxiaomibushu2d(self.post_userid,xiaomi_bushu_bushu_surr)
+            return applet_private_ports.siappxiaomibushu2d(xiaomi_bushu_bushu_surr)
 
         #生日项目
         if (self.post_mes == "生日功能帮助"):
@@ -323,5 +323,4 @@ class DingDingLanguage():
         return message
 
 if __name__ == "__main__":
-    print(DingDingLanguage("$:LWCP_v1:$lKh6TGW/6XEyY3Ho0ZAreuvmhpvC3H/R", input("输入消息：\n"), "post_userIds", None , None).selectMes())
-    
+    print(DingDingLanguage("$:LWCP_v1:$lKh6TGW/6XEyY3Ho0ZAreuvmhpvC3H/R", input("输入消息：\n"), "msafas4151", "草莓酱" , "true").selectMes())
