@@ -1,7 +1,10 @@
 # -- coding:utf-8 --
 #小程序接口
-import os,requests,json,random
+import os,requests,json,random,sys
 start_lu = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(start_lu)
+#接入小程序的接口
+from Applet.app.xiaomi.ports import xiaomiyundong_chushi
 #公共的小程序接口
 class applet_public():
     def __init__(self,post_userid):
@@ -199,24 +202,10 @@ class applet_public():
 
 #私人的小程序接口
 class applet_private():
-    def siappxiaomibushu(post_userid):
-        post_userid_1 = ("'"+post_userid+"'")
-        cmd = os.popen(f'python3 {start_lu}/app/sport-xiaomi/xiaomi.py '+post_userid_1).read()
-        message = {
-            "msgtype": "text",
-            "text": {
-                "content": cmd
-            },
-            "at": {
-                "atDingtalkIds": [post_userid],
-                "isAtAll": False
-            }
-        }
-        return message
-
     def siappxiaomibushu2d(post_userid,xiaomi_bushu_bushu_surr):
-        bushu = xiaomi_bushu_bushu_surr
-        cmd = os.popen(f'python3 {start_lu}/app/sport-xiaomi-2d/updatabs.py '+bushu).read()
+        cmd = xiaomiyundong_chushi.start(post_userid,xiaomi_bushu_bushu_surr)
+        if cmd is None:
+            cmd = "该用户未开通刷步数权限呢"
         message = {
             "msgtype": "text",
             "text": {
@@ -228,9 +217,6 @@ class applet_private():
             }
         }
         return message
-
-    def siappaolaxing(post_userid):
-        os.system(f"python3 {start_lu}/sirenkongjian/python-gongcheng/aolaxing/bingfa/start1.py")
 
     def sendText(post_userid, send_mes):
         # 发什么回复什么
