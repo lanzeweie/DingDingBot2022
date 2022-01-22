@@ -13,7 +13,8 @@ def handle_client(client_socket):
         client_socket.close()
 
 def DingDingSet():
-    with open(f"./data/DingDingSet.json","r",encoding="utf-8") as set:
+    lujin = os.path.dirname(os.path.abspath(__file__))
+    with open(f"{lujin}/data/DingDingSet.json","r",encoding="utf-8") as set:
         DingSet = set.read()
     global Post_set,ip
     DingSet_text = eval(DingSet)
