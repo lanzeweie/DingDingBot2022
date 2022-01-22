@@ -1,6 +1,6 @@
 # -- coding:UTF-8 --
 from multiprocessing import Process
-import json,time,hmac,hashlib,base64,socket,requests
+import json,time,hmac,hashlib,base64,socket,requests,os
 from Mokai.Data_life import TTLDict
 from Yuyan.DingBot_language import DingDingLanguage
 DingDing_single_shujuhuancunTime = TTLDict()
@@ -54,7 +54,8 @@ def DingDing_chushihua(request_data):
     return post_userid, post_sign, post_timestamp, post_mes, post_moshi, post_userids, post_isAdmin, post_senderNick
 
 def DingDingSet():
-    with open(f"./data/DingDingSet.json","r",encoding="utf-8") as set:
+    lujin = os.path.dirname(os.path.abspath(__file__))
+    with open(f"{lujin}/data/DingDingSet.json","r",encoding="utf-8") as set:
         DingSet = set.read()
     global Webhook_set,AppSecret_set,AppKey_set,Post_set
     DingSet_text = eval(DingSet)
