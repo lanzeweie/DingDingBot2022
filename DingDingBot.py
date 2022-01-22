@@ -5,7 +5,9 @@ from Mokai.Data_life import TTLDict
 from Yuyan.DingBot_language import DingDingLanguage
 DingDing_single_shujuhuancunTime = TTLDict()
 
-def DingDing_client(self):
+def DingDing_client(self,Token):
+    global accessToken
+    accessToken = Token
     # 获取socket
     request_data = client_socket.recv(20000)
     post_userid, post_sign, post_timestamp, post_mes, post_moshi, post_userids, post_isAdmin, post_senderNick = DingDing_chushihua(request_data)
@@ -91,7 +93,7 @@ def DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_i
     url = "https://api.dingtalk.com/v1.0/robot/oToMessages/batchSend"
     head = {
         "Host":"api.dingtalk.com",
-        "x-acs-dingtalk-access-token":DingDing_single_accessToken_yanzheng(),
+        "x-acs-dingtalk-access-token":accessToken,
         "Content-Type":"application/json"
     }
 
@@ -175,7 +177,7 @@ def DingDing_single_accessToken_yanzheng():
     if DingDing_single_accessToken == DingDing_single_accessToken_time_Token_chushi:
         return DingDing_single_accessToken
     else:
-        print("身份码过期,重新获取")
+        print("\n身份码过期,重新获取")
         DingDing_single_accessToken_time()
         DingDing_single_accessToken_backup = DingDing_single_accessToken_yanzheng_backup()
         return DingDing_single_accessToken_backup
@@ -185,7 +187,6 @@ if __name__ == "__main__":
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         server_socket.bind(("", 8978))
-        print("-------------------------------------------------------------------------")
         print("钉钉机器人启动成功")
     except:
         print("启动失败 端口被占用")
@@ -193,12 +194,13 @@ if __name__ == "__main__":
         raise
     server_socket.listen(120)
 
-    DingDing_single_accessToken_time()
     DingDingSet()
-
+    DingDing_single_accessToken_time()
+    
     while True:
+        accessToken = DingDing_single_accessToken_yanzheng()
         client_socket, client_address = server_socket.accept()
         
-        handle_client_process = Process(target=DingDing_client, args=(client_socket,))
+        handle_client_process = Process(target=DingDing_client, args=(client_socket,accessToken,))
         handle_client_process.start()
         client_socket.close()
