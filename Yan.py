@@ -3,12 +3,14 @@ import socket,requests,re,os
 from multiprocessing import Process
 
 def handle_client(client_socket):
-	try:
-		client_socket.sendall(b'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<h1>Hello World</h1>')
-	except Exception as e:
-		print(e)
-	finally:
-		client_socket.close()
+    html = 'HTTP/1.1 200 OK\r\nContent-Type: text/html\r\n\r\n<h1>DingDingBot</h1><spen></spen><h2>Surr</h2>'
+    html = bytes(html,encoding='utf8') 
+    try:
+        client_socket.sendall(html)
+    except Exception as e:
+        print(e)
+    finally:
+        client_socket.close()
 
 def DingDingSet():
     with open(f"./data/DingDingSet.json","r",encoding="utf-8") as set:
