@@ -56,11 +56,12 @@ def DingDing_chushihua(request_data):
 def DingDingSet():
     with open(f"./data/DingDingSet.json","r",encoding="utf-8") as set:
         DingSet = set.read()
-    global Webhook_set,AppSecret_set,AppKey_set
+    global Webhook_set,AppSecret_set,AppKey_set,Post_set
     DingSet_text = eval(DingSet)
     Webhook_set = (DingSet_text['set'][0]['Webhook'])
     AppSecret_set = (DingSet_text['set'][0]['AppSecret'])
     AppKey_set = (DingSet_text['set'][0]['AppKey'])
+    Post_set = (DingSet_text['set'][0]['Post'])
 
 def DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userids, post_senderNick, post_isAdmin):
     # 配置token
@@ -183,10 +184,11 @@ def DingDing_single_accessToken_yanzheng():
         return DingDing_single_accessToken_backup
 
 if __name__ == "__main__":
-    # 使用 socket 建立监听服务端 实时接受钉钉下发的信息 端口为 8978
+    DingDingSet()
+    
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        server_socket.bind(("", 8978))
+        server_socket.bind(("", Post_set))
         print("钉钉机器人启动成功")
     except:
         print("启动失败 端口被占用")
@@ -194,7 +196,6 @@ if __name__ == "__main__":
         raise
     server_socket.listen(120)
 
-    DingDingSet()
     DingDing_single_accessToken_time()
     
     while True:
