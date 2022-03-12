@@ -247,6 +247,27 @@ class project_private():
                 }
                 return message
 
+        def Birtday_mlh(self):
+            sys.path.append(start_lu) 
+            from app.Birthday.Birthday_mlh import Birthdaymlh
+            markdownpd = (Birthdaymlh(self.post_mes[6:]).mlh())
+            try:
+                if markdownpd[0] == "help":
+                    message = {
+                        "msgtype": "markdown",
+                        "markdown": {
+                            "title": "|🎂Birthday mlh🎂|",
+                            "text": markdownpd[1]
+                        },
+                        "at": {
+                            "atDingtalkIds": [self.post_userid],
+                            "isAtAll": False
+                        }
+                    }
+                    return message
+            except:
+                pass
+            return project_private.gongyong.sendText(self.post_userid,markdownpd)
 
     class gongyong():
         def sendText(post_userid, send_mes):

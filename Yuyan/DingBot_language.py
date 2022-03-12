@@ -184,6 +184,14 @@ class DingDingLanguage():
         elif mother_txt == '查询所有月生日':
             return project_private.Birtday(self.post_userid,None).Birthday_all_Send()
 
+        #新版命令 使用 /srml 作索引
+        if self.post_mes.find("/srml",0,5) == 0:
+            if self.post_isAdmin == True:
+                return project_private.Birtday(self.post_userid,self.post_mes).Birtday_mlh()
+            else:
+                send_mes = "你无权进行此操作,你需要管理员权限！"
+                return DingDingLanguage.sendText(self.post_userid, send_mes)
+
         #基层命令
         if (self.post_mes == "获得我的ID"):
             return DingDingLanguage().DicenghuodeID(self.post_userid)
@@ -323,4 +331,4 @@ class DingDingLanguage():
         return message
 
 if __name__ == "__main__":
-    print(DingDingLanguage("$:LWCP_v1:$lKh6TGW/6XEyY3Ho0ZAreuvmhpvC3H/R", input("输入消息：\n"), "msafas4151", "草莓酱" , "true").selectMes())
+    print(DingDingLanguage("$:LWCP_v1:$lKh6TGW/6XEyY3Ho0ZAreuvmhpvC3H/R", input("输入消息：\n"), "msafas4151", "草莓酱" , True).selectMes())
