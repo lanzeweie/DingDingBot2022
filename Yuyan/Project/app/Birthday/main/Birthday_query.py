@@ -77,10 +77,23 @@ class BirthdayQuery():
                     return Birthday_json_moth_date
                 else:
                     pass
-    
-        
+
+    def Birthday_class_mother():
+        #把数据库的信息按照月份分类后显示出来
+        with open(weizhi+'/json/Birthday.json','r',encoding='utf-8') as xinxi:
+            Birthday_text = xinxi.read()
+        Birthday_json = json.loads(Birthday_text)
+        mother_inspect = [1,2,3,4,5,6,7,8,9,10,11,12]
+        mother_mes = "生日数据库"
+        for mother in mother_inspect:
+            mother_mes += f"\n---------{mother}月-----------"
+            alter_mother_len = len(Birthday_json["list"][0]["mother"+str(mother)])
+            for xtnamepd in range(alter_mother_len):
+                mother_mes += "\n" + Birthday_json["list"][0]["mother"+str(mother)][xtnamepd]["name"] + Birthday_json["list"][0]["mother"+str(mother)][xtnamepd]["date"]
+        return mother_mes
 
 if __name__ == "__main__":
     #print(BirthdayQuery.Birthday_date_json(input("输入月份 纯数字\n:")))
     #print(BirthdayQuery.Birthday_date_text(input("输入月份 纯数字\n:")))
-    print(BirthdayQuery.Birthday_appoint(input("输入名字 \n:")))
+    #print(BirthdayQuery.Birthday_appoint(input("输入名字 \n:")))
+    print(BirthdayQuery.Birthday_class_mother())
