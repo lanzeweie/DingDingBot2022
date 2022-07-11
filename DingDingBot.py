@@ -1,6 +1,6 @@
 # -- coding:UTF-8 --
 from multiprocessing import Process
-import json,time,hmac,hashlib,base64,socket,requests,os
+import json,time,hmac,hashlib,base64,socket,requests,os,shutil,datetime
 from Mokai.Data_life import TTLDict
 from Yuyan.DingBot_language import DingDingLanguage
 DingDing_single_shujuhuancunTime = TTLDict()
@@ -16,6 +16,11 @@ def DingDing_client(self,Token):
     print(f"用户名称：{post_senderNick}\n",end="")
     print(f"用户群ID：{post_userid} ",end="")
     print(f"用户私ID：{post_userids}")
+    now_log_detime = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')
+    log_mess = {(f"用户消息：{post_mes}"),(f"聊天模式：{post_moshi} "),(f"用户名称：{post_senderNick}"),(f"用户群ID：{post_userid} "),(f"用户私ID：{post_userids}")}
+    #日志录入
+    with open((now_weizhi+"/log/last.log"),"a",encoding="utf-8") as last_log:
+        last_log.write((now_log_detime)+"\n"+str(log_mess)+"\n")
     # 使用socket 回应钉钉 并查看模式
     if post_moshi == "2":
         #群聊模式
@@ -84,6 +89,10 @@ def DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userid
         }
         # 发送消息
         message_json = json.dumps(DingDingLanguage(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin).selectMes())
+        #日志录入
+        now_log_detime = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')
+        with open((now_weizhi+"/log/last.log"),"a",encoding="utf-8") as last_log:
+            last_log.write((now_log_detime)+"\n"+f"群聊投出消息：{message_json}"+"\n")
         # 返回发送状态
         info = requests.post(url=webhook, data=message_json, headers=header)
         print(info.text)
@@ -103,6 +112,12 @@ def DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_i
     DingDing_single_message_json_xiaoxiti = (DingDing_single_message_json)
     DingDing_single_message_json_zhuanyi = (DingDing_single_xiaoxiti_zhuanyi(post_userids, DingDing_single_message_json_xiaoxiti))
     print(f"投出消息\n{DingDing_single_message_json_zhuanyi}")
+    #日志录入
+    now_log_detime = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')
+    with open((now_weizhi+"/log/last.log"),"a",encoding="utf-8") as last_log:
+        last_log.write((now_log_detime)+"\n"+f"私聊投出消息：{DingDing_single_message_json_zhuanyi}"+"\n")
+    info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
+    info_text = eval(info.text)
     info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
     info_text = eval(info.text)
     
@@ -198,6 +213,19 @@ if __name__ == "__main__":
     server_socket.listen(120)
 
     DingDing_single_accessToken_time()
+
+    #日志创建
+    now_weizhi = os.path.dirname(os.path.abspath(__file__))
+    last_nowtime = datetime.datetime.now().strftime('%Y-%m-%dI%H_%M_%S')
+    if os.path.exists(now_weizhi+"/log/last.log") == True:
+        shutil.move((now_weizhi+"/log/last.log"),now_weizhi+"/log/"+str(last_nowtime)+"_last.log")
+        shutil.make_archive(base_name=(now_weizhi+"/log/"+str(last_nowtime)+"_last.log"),format='zip',root_dir=now_weizhi+'/log')
+        os.unlink(now_weizhi+"/log/"+str(last_nowtime)+"_last.log")
+        with open((now_weizhi+"/log/last.log"),"w",encoding="utf-8") as last_log:
+            last_log.write(f"[{datetime.datetime.now().strftime('%Y年-%m日-%d日|%H_%M_%S')} 钉钉机器人日志]")
+    else:
+        with open((now_weizhi+"/log/last.log"),"w",encoding="utf-8") as last_log:
+            last_log.write(f"[{datetime.datetime.now().strftime('%Y年-%m日-%d日|%H_%M_%S')} 钉钉机器人日志]")
     
     while True:
         accessToken = DingDing_single_accessToken_yanzheng()
