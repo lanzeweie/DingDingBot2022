@@ -1,6 +1,6 @@
 # -- coding:UTF-8 --
 from multiprocessing import Process
-import json,time,hmac,hashlib,base64,socket,requests,os,shutil,datetime
+import json,time,hmac,hashlib,base64,socket,requests,os,zipfile,datetime
 from Mokai.Data_life import TTLDict
 from Yuyan.DingBot_language import DingDingLanguage
 DingDing_single_shujuhuancunTime = TTLDict()
@@ -20,14 +20,14 @@ def DingDing_client(self,Token):
     log_mess = {(f"用户消息：{post_mes}"),(f"聊天模式：{post_moshi} "),(f"用户名称：{post_senderNick}"),(f"用户群ID：{post_userid} "),(f"用户私ID：{post_userids}")}
     #日志录入
     with open((now_weizhi+"/log/last.log"),"a",encoding="utf-8") as last_log:
-        last_log.write((now_log_detime)+"\n"+str(log_mess)+"\n")
+        last_log.write("\n"+(now_log_detime)+"\n用户发送消息："+str(log_mess)+"\n")
     # 使用socket 回应钉钉 并查看模式
     if post_moshi == "2":
         #群聊模式
-        DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userids, post_senderNick, post_isAdmin)
+        DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userids, post_senderNick, post_isAdmin, post_moshi)
     if post_moshi == "1":
         #单聊模式
-        DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin)
+        DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin, post_moshi)
     # 关闭socket
     client_socket.close()
 
@@ -69,7 +69,7 @@ def DingDingSet():
     AppKey_set = (DingSet_text['set'][0]['AppKey'])
     Post_set = (DingSet_text['set'][0]['Post'])
 
-def DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userids, post_senderNick, post_isAdmin):
+def DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userids, post_senderNick, post_isAdmin, post_moshi):
     # 配置token
     # 得到当前时间戳
     timestamp = str(round(time.time() * 1000))
@@ -88,7 +88,7 @@ def DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userid
             "Charset": "UTF-8"
         }
         # 发送消息
-        message_json = json.dumps(DingDingLanguage(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin).selectMes())
+        message_json = json.dumps(DingDingLanguage(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin, post_moshi).selectMes())
         #日志录入
         now_log_detime = datetime.datetime.now().strftime('[%Y-%m-%d %H:%M:%S]')
         with open((now_weizhi+"/log/last.log"),"a",encoding="utf-8") as last_log:
@@ -99,7 +99,7 @@ def DingDing_group(post_userid, post_sign, post_timestamp, post_mes, post_userid
     else:
         print("Warning:Not DingDing's post")
 
-def DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin):
+def DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin, post_moshi):
     #与群聊获得消息的接口一致，获取后转义成可识别语句
     url = "https://api.dingtalk.com/v1.0/robot/oToMessages/batchSend"
     head = {
@@ -108,7 +108,7 @@ def DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_i
         "Content-Type":"application/json"
     }
 
-    DingDing_single_message_json = json.dumps(DingDingLanguage(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin).selectMes())
+    DingDing_single_message_json = json.dumps(DingDingLanguage(post_userid, post_mes, post_userids, post_senderNick, post_isAdmin, post_moshi).selectMes())
     DingDing_single_message_json_xiaoxiti = (DingDing_single_message_json)
     DingDing_single_message_json_zhuanyi = (DingDing_single_xiaoxiti_zhuanyi(post_userids, DingDing_single_message_json_xiaoxiti))
     print(f"投出消息\n{DingDing_single_message_json_zhuanyi}")
@@ -118,9 +118,11 @@ def DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_i
         last_log.write((now_log_detime)+"\n"+f"私聊投出消息：{DingDing_single_message_json_zhuanyi}"+"\n")
     info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
     info_text = eval(info.text)
-    info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
-    info_text = eval(info.text)
-    
+    if info.text["message"] == "不合法的access_token":
+        print("access_token过期，已经重新获取并且重新发送消息")
+        time.sleep(0.2)
+        info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
+        info_text = eval(info.text)
     try:
         single_message_text = info_text["message"]
         if single_message_text == "msgParam必须是json格式":
@@ -214,18 +216,26 @@ if __name__ == "__main__":
 
     DingDing_single_accessToken_time()
 
-    #日志创建
+    #保存日志，如果日志存在则压缩先前日志
     now_weizhi = os.path.dirname(os.path.abspath(__file__))
-    last_nowtime = datetime.datetime.now().strftime('%Y-%m-%dI%H_%M_%S')
-    if os.path.exists(now_weizhi+"/log/last.log") == True:
-        shutil.move((now_weizhi+"/log/last.log"),now_weizhi+"/log/"+str(last_nowtime)+"_last.log")
-        shutil.make_archive(base_name=(now_weizhi+"/log/"+str(last_nowtime)+"_last.log"),format='zip',root_dir=now_weizhi+'/log')
-        os.unlink(now_weizhi+"/log/"+str(last_nowtime)+"_last.log")
-        with open((now_weizhi+"/log/last.log"),"w",encoding="utf-8") as last_log:
-            last_log.write(f"[{datetime.datetime.now().strftime('%Y年-%m日-%d日|%H_%M_%S')} 钉钉机器人日志]")
-    else:
-        with open((now_weizhi+"/log/last.log"),"w",encoding="utf-8") as last_log:
-            last_log.write(f"[{datetime.datetime.now().strftime('%Y年-%m日-%d日|%H_%M_%S')} 钉钉机器人日志]")
+    log_path = os.path.join(now_weizhi, 'log')
+    if not os.path.exists(log_path):
+        os.mkdir(log_path)
+    last_log_file = os.path.join(log_path, 'last.log')
+    if os.path.exists(last_log_file):
+        date_str = time.strftime('%Y-%m-%dI%H-%M-%S', time.localtime())
+        new_log_file = os.path.join(log_path, f'{date_str}_last.log')
+        os.rename(last_log_file, new_log_file)
+    with open(last_log_file, 'w') as f:
+        pass
+    # 压缩上一次的日志文件
+    try:
+        if os.path.exists(new_log_file):
+            with zipfile.ZipFile(f'{new_log_file}.zip', 'w') as z:
+                z.write(new_log_file, os.path.basename(new_log_file))
+            os.remove(new_log_file)
+    except:
+        pass
     
     while True:
         accessToken = DingDing_single_accessToken_yanzheng()
