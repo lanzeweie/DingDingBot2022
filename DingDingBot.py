@@ -118,11 +118,20 @@ def DingDing_single(post_userid, post_mes, post_userids, post_senderNick, post_i
         last_log.write((now_log_detime)+"\n"+f"私聊投出消息：{DingDing_single_message_json_zhuanyi}"+"\n")
     info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
     info_text = eval(info.text)
-    if info.text["message"] == "不合法的access_token":
-        print("access_token过期，已经重新获取并且重新发送消息")
-        time.sleep(0.2)
-        info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
-        info_text = eval(info.text)
+    try:
+        if info_text["message"] == "不合法的access_token":
+            print("access_token过期，已经重新获取并且重新发送消息")
+            accessToken_1 = DingDing_single_accessToken_yanzheng()
+            head = {
+                "Host":"api.dingtalk.com",
+                "x-acs-dingtalk-access-token":accessToken_1,
+                "Content-Type":"application/json"
+            }
+            info = requests.post(url,headers=head,json=DingDing_single_message_json_zhuanyi)
+            print(info.text)
+            info_text = eval(info.text)
+    except:
+        pass
     try:
         single_message_text = info_text["message"]
         if single_message_text == "msgParam必须是json格式":
