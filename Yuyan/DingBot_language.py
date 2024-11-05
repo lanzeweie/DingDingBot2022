@@ -1,17 +1,27 @@
 # -- coding:utf-8 --
 #钉钉机器人独立语言模块
-import configparser,re,os,time,datetime,requests,json,sys
+import configparser
+import datetime
+import json
+import os
+import re
+import sys
+import time
+
+import requests
+
 start_lu = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(start_lu)
 print("\n开始进行 钉钉语言模块 初始化")
 print("-------------------------------------------------------------------------")
-from Applet.ports import applet_public,applet_private
-print("\n钉钉语言模块 小程序 已接入完毕")
-from Project.ports import project_public,project_private
-print("\n钉钉语言模块 项目 已接入完毕")
-from Applet.ports import applet_public,applet_private
-from Project.ports import project_public,project_private
+from Applet.ports import applet_private, applet_public
 
+print("\n钉钉语言模块 小程序 已接入完毕")
+from Project.ports import project_private, project_public
+
+print("\n钉钉语言模块 项目 已接入完毕")
+from Applet.ports import applet_private, applet_public
+from Project.ports import project_private, project_public
 
 
 class DingDingLanguage():
@@ -38,16 +48,6 @@ class DingDingLanguage():
         #具体bot信息配置  格式： eval(变量) 不然无法执行    mes代表普通消息 app代表小程序消息
         #普通消息
         bot_mes_jieshao = bot_w.get("all","jieshao_mes")
-        #jielu-------------------------------------------------
-        #jieluhelp 帮助
-        bot_message_jieluhelp = bot_w.get("all", "jieluhelp")
-        #jieluday 天数
-        bot_message_jieluday = bot_w.get("all","jieluday")
-        #jieluloser 重置
-        bot_message_jieluloser = bot_w.get("all","jieluloser")
-        #jielujihua 加入计划
-        bot_message_jielujihua = bot_w.get("all","jielujihua")
-
         #app----------------------------------------------------
         #HM-ACG-jpg app-hmacgjpg   管理:app-hmacgjpg_up  非管理:app-hmacgjpg_up_no
         bot_message_app_hmacgjpg = bot_w.get("all", "app-hmacgjpg")
@@ -76,21 +76,11 @@ class DingDingLanguage():
             send_mes = '你好啊朋友(*^_^*)!'
             return DingDingLanguage.sendText(self.post_userid, send_mes)
         if (self.post_mes == '你是谁'):
-            send_mes = '我是周爸爸的小可爱😔~~'
+            send_mes = '我是主人的小可爱😔~~'
             return DingDingLanguage.sendText(self.post_userid, send_mes)
         #普通消息 长信息
         if (eval(bot_mes_jieshao)):
             return DingDingLanguage.BotMesJiaoshao(self.post_userid)
-        #Jielu  
-        if (eval(bot_message_jieluhelp)):
-            return project_public.jielu(self.post_userid,None).jieluhelp()
-        if (eval(bot_message_jieluloser)):
-            return project_public.jielu(self.post_userid,None).jieluloser(self.post_senderNick)
-        if (eval(bot_message_jieluday)):
-            return project_public.jielu(self.post_userid,None).jielucx()
-        if (eval(bot_message_jielujihua)):
-            return project_public.jielu(self.post_userid,None).jielugo(self.post_userIds,self.post_senderNick)
-
         #app-----------------------------------------------------------------------------------
         #HM-ACG-url 带管理
         if (eval(bot_message_app_hmacgjpg)):
@@ -98,7 +88,7 @@ class DingDingLanguage():
         if (eval(bot_message_app_hmacgjpg_up)):
             return applet_public_ports.appHMACGurlUP()
         if (eval(bot_message_app_hmacgjpg_up_no)):
-            send_mes = '''你没有权力哦,只有我的周爸爸可以命令我干这种事情哦(●'◡'●)'''
+            send_mes = '''你没有权力哦,只有我的主人可以命令我干这种事情哦(●'◡'●)'''
             return DingDingLanguage.sendText(self.post_userid, send_mes)
         if (self.post_mes == "幻猫网帮助"):
             return applet_public_ports.appHMACGhelp()
@@ -124,7 +114,7 @@ class DingDingLanguage():
         if (eval(bot_message_app_picbian_up)):
             return applet_public_ports.appPICbianUP(self.post_userid)
         elif (eval(bot_message_app_picbian_up_no)):
-            send_mes = '''你没有权力哦,只有我的周爸爸可以命令我干这种事情哦(●'◡'●)'''
+            send_mes = '''你没有权力哦,只有我的主人可以命令我干这种事情哦(●'◡'●)'''
             return DingDingLanguage.sendText(self.post_userid, send_mes)
         #彼岸网 主程序 分解词语
         picbian_app_panduan_ci = self.post_mes[0:self.post_mes.rfind('的')]
@@ -214,6 +204,8 @@ class DingDingLanguage():
             
         #最后一层 如果用户的话都没有结果 那就直接复读
         else:
+            # 添加chatgpt，支持连续对话与记忆
+            return DingDingLanguage.ChatGPT(self.post_userid ,self.post_userIds, self.post_mes, self.post_senderNick, self.post_moshi)
             return DingDingLanguage.sendText(self.post_userid, self.post_mes+'          [我是复读机(∩_∩)]')
 
 
@@ -299,7 +291,21 @@ class DingDingLanguage():
             }
         }
         return message
-
+    
+    #ChatGpt,支持连续对话，支持私聊单人历史消息，群聊共同消息
+    def ChatGPT(post_userid, post_userIds, send_mes, post_senderNick, post_moshi):
+        message = {
+            "msgtype": "text",
+            "text": {
+                "content": applet_public.chatgpt(post_userIds, send_mes, post_senderNick, post_moshi)
+            },
+            "at": {
+                "atDingtalkIds": [post_userid],
+                "isAtAll": False
+            }
+        }
+        return message
+    
     #底层功能
     def DicenghuodeID(post_userid):
         #获取ID

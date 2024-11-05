@@ -6,6 +6,7 @@ sys.path.append(start_lu)
 #接入小程序的接口
 from Applet.app.xiaomi.ports import xiaomiyundong_chushi
 from Applet.app.weather.ports import weather_query
+from Applet.app.Chat.OpenAi.chatgpt import ChatgptDL,ChatgptQUN
 #公共的小程序接口
 class applet_public():
     def __init__(self,post_userid, post_mes, post_userIds, post_senderNick, post_isAdmin):
@@ -202,6 +203,13 @@ class applet_public():
             }
         }
         return message
+
+    def chatgpt(post_userIds, send_mes, post_senderNick, post_moshi):
+        #2023/4/21 支持连续对话,单聊私人聊天记录，群聊共享聊天记录
+        if post_moshi == "1":
+            return ChatgptDL.init(post_userIds,post_senderNick,send_mes)
+        elif post_moshi == "2":
+            return ChatgptQUN.init(post_senderNick,send_mes)
 
 #私人的小程序接口
 class applet_private():

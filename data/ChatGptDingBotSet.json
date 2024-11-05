@@ -1,0 +1,8 @@
+{
+    "name":"OpenAi 的ChatGPT",
+    "api_key":"填写OpenAi的Key",
+    "base_url":"填写Api地址",
+    "model":"模型名称",
+    "danliao_max":"40",
+    "qunliao_max":"40"
+}
