@@ -27,7 +27,7 @@ client = OpenAI(
 # 设置配置参数
 siliao_xiaoxi = int(config.get("danliao_max", 80))
 qunliao_xiaoxi = int(config.get("qunliao_max", 80))
-
+model_set = config.get("model", "gpt-40-mini")
 shangji_lujin = os.path.dirname(os.path.abspath(__file__))
 #————————配置———————————
 #私聊最大消息记录 
@@ -43,7 +43,7 @@ class Gonggong:
         # 发送ChatGPT请求
         try:
             response = client.chat.completions.create(
-                model="gpt-4o-mini", 
+                model=model_set, 
                 temperature=0.8,
                 timeout=5,
                 top_p=1,

@@ -40,3 +40,20 @@ DingDing_single传出的参数有
 ![文件结构无注释版](./README/1.png)   
 ![文件结构注释版](./README/2.png)   
 ![文件结构详解版](./README/3.png)  
+
+
+### ChatGPT
+配置 `data\ChatGptDingBotSet.json`    
+```
+{
+    "name":"OpenAi 的ChatGPT",
+    "api_key":"填写OpenAi的Key",
+    "base_url":"填写Api地址",
+    "model":"模型名称",
+    "danliao_max":"40",
+    "qunliao_max":"40"
+}
+```
+提示词修改代码 `Yuyan\Applet\app\Chat\OpenAi\chatgpt.py`    
+单聊：140行  
+群聊：178行  
