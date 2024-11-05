@@ -25,12 +25,13 @@ from Project.ports import project_private, project_public
 
 
 class DingDingLanguage():
-    def __init__(self, post_userid, post_mes, post_userIds, post_senderNick, post_isAdmin):
+    def __init__(self, post_userid, post_mes, post_userIds, post_senderNick, post_isAdmin,post_moshi):
         self.post_userid = post_userid
         self.post_mes = post_mes
         self.post_userIds = post_userIds
         self.post_senderNick = post_senderNick
         self.post_isAdmin = post_isAdmin
+        self.post_moshi = post_moshi
         
     def selectMes(self):
         applet_public_ports = applet_public(self.post_userid, self.post_mes, self.post_userIds, self.post_senderNick, self.post_isAdmin)
@@ -206,7 +207,7 @@ class DingDingLanguage():
         else:
             # 添加chatgpt，支持连续对话与记忆
             return DingDingLanguage.ChatGPT(self.post_userid ,self.post_userIds, self.post_mes, self.post_senderNick, self.post_moshi)
-            return DingDingLanguage.sendText(self.post_userid, self.post_mes+'          [我是复读机(∩_∩)]')
+            #return DingDingLanguage.sendText(self.post_userid, self.post_mes+'          [我是复读机(∩_∩)]')
 
 
     def sendText(post_userid, send_mes):
@@ -337,4 +338,4 @@ class DingDingLanguage():
         return message
 
 if __name__ == "__main__":
-    print(DingDingLanguage("$:LWCP_v1:$lKh6TGW/6XEyY3Ho0ZAreuvmhpvC3H/R", input("输入消息：\n"), "msafas4151", "草莓酱" , True).selectMes())
+    print(DingDingLanguage("$:LWCP_v1:$lKh6TGW/6XEyY3Ho0ZAreuvmhpvC3H/R", input("输入消息：\n"), "msafas4151", "草莓酱" , True,"2").selectMes())
